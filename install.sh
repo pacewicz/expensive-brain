@@ -1,13 +1,13 @@
 #!/bin/bash
-# install.sh — link the orchestrate-with-subagents skill into agent skill directories.
+# install.sh — link the expensive-brain skill into agent skill directories.
 # Symlinks by default; pass --copy for filesystems/OSes where symlinks hurt.
 set -euo pipefail
 
-SRC="$(cd "$(dirname "$0")" && pwd)/.agents/skills/orchestrate-with-subagents"
+SRC="$(cd "$(dirname "$0")" && pwd)/.agents/skills/expensive-brain"
 MODE="${1:-link}"
 
 place() {
-  local dest_dir="$1" dest="$1/orchestrate-with-subagents"
+  local dest_dir="$1" dest="$1/expensive-brain"
   mkdir -p "$dest_dir"
   if [[ -e "$dest" || -L "$dest" ]]; then
     echo "skip  $dest (exists)"

@@ -1,6 +1,6 @@
 # Repo instructions (all agents)
 
-This repo ships one agent skill: `.agents/skills/orchestrate-with-subagents/SKILL.md`.
+This repo ships one agent skill: `.agents/skills/expensive-brain/SKILL.md`.
 The top-level `skills/` is a compatibility symlink for the Claude Code plugin
 format — edit only under `.agents/`.
 

@@ -1,9 +1,9 @@
 ---
-name: orchestrate-with-subagents
+name: expensive-brain
 description: Use when a coding-agent session running an expensive model is about to search, grep, read many files, run web lookups, survey a codebase, execute a multi-task plan or do bulk mechanical work, or when it is about to dispatch a subagent without choosing that subagent's model.
 ---
 
-# Orchestrate with subagents
+# Expensive brain
 
 ## Core principle
 

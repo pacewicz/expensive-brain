@@ -1,4 +1,4 @@
-# orchestrate-with-subagents
+# expensive-brain
 
 An agent skill that keeps an expensive session model (Opus, Fable, a top-tier
 Codex preset) in the **driver/brain** role. Search, survey, bulk and mechanical
@@ -38,31 +38,30 @@ project level):
   not for grunt work.
 - Plans with 2+ tasks: subagent-driven execution; announce, don't ask.
 - Independent agents: dispatch them in one response.
-- Details: skill `orchestrate-with-subagents`.
+- Details: skill `expensive-brain`.
 ```
 
 ## Does it work?
 
 These are small-sample A/B runs on Claude Code (`claude -p`, Fable 5.2,
 vanilla config with no user instructions or plugins). The task was a
-read-only "how does feature X work across this Go codebase" question. Each
-arm ran twice.
+read-only "how does feature X work across this Go codebase" question.
 
-| Arm | Main session | Subagent | Top-tier spend (relative) | Wall-clock |
+| Arm (runs) | Main session | Subagent | Top-tier spend (relative) | Wall-clock |
 |---|---|---|---|---|
-| No skill | 5 inline grep/bash calls, 0 dispatches | none | 1.0× | ~30 s |
-| Skill only | the skill self-triggered, then 1 dispatch | sonnet | ~0.6× | ~70 s |
-| Skill + always-loaded rule | 1 dispatch first | sonnet | ~0.45× | ~60 s |
+| No skill (2) | 5 inline grep/bash calls, 0 dispatches | none | 1.0× | ~30 s |
+| Skill only (4) | the skill self-triggered, then 1 dispatch | sonnet | ~0.65× | 64–81 s |
+| Skill + always-loaded rule (3) | 1 dispatch first | sonnet | ~0.5× | 54–80 s |
 
 The inline lookups in the skill arms came *after* the subagent returned,
-as spot-checks of its claims, which is what the skill prescribes. Two runs
-per arm is a signal, not a benchmark.
+as spot-checks of its claims, which is what the skill prescribes. Small n: a signal,
+not a benchmark.
 
 ## Layout
 
 One canonical file, many links:
 
-- `.agents/skills/orchestrate-with-subagents/SKILL.md`: the only copy.
+- `.agents/skills/expensive-brain/SKILL.md`: the only copy.
 - `skills -> .agents/skills`: compatibility path for Claude Code plugins.
 - `AGENTS.md`: repo instructions. `CLAUDE.md` and `GEMINI.md` point to it.
 
