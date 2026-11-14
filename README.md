@@ -1,28 +1,30 @@
 # orchestrate-with-subagents
 
-A Claude Code skill that keeps an expensive session model (Opus, Fable) in the
-**driver / brain** role. Search, survey, bulk and mechanical work goes to
-subagents pinned to a cheaper model. The main context keeps decisions,
-synthesis and the final answer.
+An agent skill that keeps an expensive session model (Opus, Fable, a top-tier
+Codex preset) in the **driver/brain** role. Search, survey, bulk and mechanical
+work goes to subagents pinned to cheaper models. The main context keeps
+decisions, synthesis and the final answer.
 
-It was distilled from the instructions that produce this behaviour in one
-long-running Claude Code setup. Nothing in that setup *enforces* delegation
-(there are no hooks and no env vars). The behaviour comes from a small set of
-rules that are loaded on every session.
+The skill text is agent-agnostic: actions are phrased generically, and
+harness specifics sit in a per-harness table. It covers Claude Code, Codex
+CLI, Gemini CLI, Antigravity and Hermes Agent.
 
 ## Install
 
+Clone the repo, then symlink the one canonical skill into each agent's
+skills directory:
+
 ```bash
-mkdir -p ~/.claude/skills
-cp -r skills/orchestrate-with-subagents ~/.claude/skills/
+./install.sh          # symlinks (default)
+./install.sh --copy   # copies, for filesystems where symlinks hurt
 ```
 
-## Make it stick: also add the always-loaded rule
+## Make it stick: add the always-loaded rule
 
-A skill only loads when the model decides its description matches the task,
-and a model that is about to "just run one grep" often doesn't stop to check.
-What makes the behaviour default is an **always-loaded** rule. Add this to
-`~/.claude/CLAUDE.md` (all projects) or to a project's `CLAUDE.md`:
+A skill loads only when the model decides it's relevant. A model about to
+"just run one grep" often doesn't stop to check. Add this rule to whatever
+your agent always loads (`CLAUDE.md`, `AGENTS.md` or `GEMINI.md`, at user or
+project level):
 
 ```markdown
 ## Delegation
@@ -30,18 +32,39 @@ What makes the behaviour default is an **always-loaded** rule. Add this to
   surveys, web lookups and mechanical work go to subagents that return
   conclusions, not dumps. A single one-line dependent lookup may run inline;
   two or more never.
-- Always pass `model` on Agent calls: sonnet by default, haiku for read-only
-  bulk triage, the session model only for judging/design/adversarial review.
-  `fork` ignores `model`, so don't fork grunt work.
+- Always set the subagent's model explicitly: mid-tier (e.g. sonnet) by
+  default, cheapest for read-only bulk triage, the session model only for
+  judging/design/adversarial review. Forks that inherit the parent model are
+  not for grunt work.
 - Plans with 2+ tasks: subagent-driven execution; announce, don't ask.
-- Independent agents: launch them in one message.
+- Independent agents: dispatch them in one response.
 - Details: skill `orchestrate-with-subagents`.
 ```
 
-The [superpowers](https://github.com/obra/superpowers) plugin
-(`subagent-driven-development`, `dispatching-parallel-agents`) pairs well
-with this skill. It covers *how* to run a plan through subagents; this skill
-covers *when* to delegate and *which model* to use.
+## Does it work?
+
+These are small-sample A/B runs on Claude Code (`claude -p`, Fable 5.2,
+vanilla config with no user instructions or plugins). The task was a
+read-only "how does feature X work across this Go codebase" question. Each
+arm ran twice.
+
+| Arm | Main session | Subagent | Top-tier spend (relative) | Wall-clock |
+|---|---|---|---|---|
+| No skill | 5 inline grep/bash calls, 0 dispatches | none | 1.0× | ~30 s |
+| Skill only | the skill self-triggered, then 1 dispatch | sonnet | ~0.6× | ~70 s |
+| Skill + always-loaded rule | 1 dispatch first | sonnet | ~0.45× | ~60 s |
+
+The inline lookups in the skill arms came *after* the subagent returned,
+as spot-checks of its claims, which is what the skill prescribes. Two runs
+per arm is a signal, not a benchmark.
+
+## Layout
+
+One canonical file, many links:
+
+- `.agents/skills/orchestrate-with-subagents/SKILL.md`: the only copy.
+- `skills -> .agents/skills`: compatibility path for Claude Code plugins.
+- `AGENTS.md`: repo instructions. `CLAUDE.md` and `GEMINI.md` point to it.
 
 ## License
 
